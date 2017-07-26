@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,minimal-ui">
+<title>看你有多色</title>
+<script src="lib/jquery.js"></script>
+<style type="text/css">
+	*{
+		margin: 0;
+		padding: 0;
+	}
+	body,html{
+		width: 100%;
+		height: 100%;
+	}
+	.div{
+		display: none;
+		position: relative;
+		width: 100%;
+		height: 100%;
+		background-color: #D03B3B;
+	}
+	.block{
+		display: block;
+	}
+	h1{
+		padding-top: 8%;
+		text-shadow:-1px -1px rgba(197, 223, 248,0.8),-2px -2px rgba(197, 223, 248,0.8),-3px -3px rgba(197, 223, 248,0.8),-4px -4px rgba(197, 223, 248,0.8),-5px -5px rgba(197, 223, 248,0.8),-6px -6px rgba(197, 223, 248,0.8);
+		text-align: center;
+		color: white;
+	}
+	/*第一个画面的样式*/
+	#one .help{
+		text-align: center;
+		padding-top: 5%;
+		font-size: 1.5em;
+		color: rgb(195, 216, 170);
+	}
+	#one .beginning{
+		width: 30%;
+		height: 10%;
+		background-color: #80A77D;
+		bottom: 15%;
+		left: 0;
+		right: 0;
+		margin: auto;
+		position: absolute;
+		border-radius: 20%;
+		box-shadow: inset 0 0 10px red;
+		color: #3E3802;
+	}
+	/*第一个画面的样式*/
+
+
+	/*第2个画面的样式*/
+	#two .but{
+		/*background-color: white;*/
+		width:70%;
+		height: 10%;
+		margin: 20px auto;
+		text-align: center;
+	}
+	#two .button{
+		width: 40%;
+		height: 100%;
+		border-radius: 20%;
+		background-color: #A88E43;
+		border: 2px solid #D1CD4D;
+		font-size: 20px;
+		font-weight: bold;
+		color: #00FFE7;
+		text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 40px #ff00de, 0 0 70px #ff00de; 
+
+	}
+	/*第2个画面的样式*/
+	
+
+	/*第3个画面的样式*/
+	#three .warp{
+		position: relative;
+		width:350px;
+		height:100%;
+		/*border:2px solid white;*/
+		margin:0px auto;
+	}
+	#three .warp header{
+		position: absolute;
+		top: 5%;
+		width: 100%;
+		/*border: 1px solid black;*/
+	}
+	#three .time{
+		/*position: absolute;*/
+		display: block;
+		width: 50px;
+		height: 40px;
+		border-radius: 50%;
+		margin: 0 auto;
+		text-align: center;
+		font-size: 2em;
+		line-height: 1.3;
+		color: white;
+		background-color: rgba(200,200,200,.5);
+	}
+	#three .stop{
+		position: absolute;
+		width: 120px;
+		height: 40px;
+		border: 2px solid white;
+		border-radius: 30%;
+		top: 0;
+		right: 0;
+		font-size: 1em;
+		color: white;
+		background-color: #99A621;
+	}
+	#three .fen{
+		position: absolute;
+		top: 5px;
+		left: 0; 
+		font-size: 1.5em;
+		color: white; 
+	}
+	#three .box{
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		margin: auto;
+		width: 500px;
+		height: 500px;
+		background-color: white;
+		border-radius: 10px;
+		/*border: 10px solid #DEDEBA;*/
+	}
+	#three .box .box_data{
+		width: 121px;
+		height: 121px;
+		border-radius: 3px;
+		background-color: yellow;
+		border:2px solid #eee;
+		float: left;
+	}
+	/*第3个画面的样式*/
+</style>
+</head>
+<body>
+	<div id="one" class="div block">
+		<h1>看你有多色</h1>
+		<div class="help">找出所有色块颜色不一样的值</div>
+		<button class="beginning" value="">开始游戏</button>
+	</div>
+	<div id="two" class="div ">
+		<h1>游戏暂停</h1>
+		<div class="but">		
+			<button class="button" id="continue">
+				继续
+			</button>
+			<button class="button" id='again'>
+				重来
+			</button>
+		</div>
+	</div>
+	<div id="three" class="div ">
+	</div>
+</body>
+<script type="text/javascript">
+	(function($){
+		var Page = function(id,setting){
+			var self = this;
+			this.id = id;
+			this.setting = {
+				maxW:500,
+				minW:300,
+				boxs_row:4,
+				boxs_border_size:10,
+				boxs_border_color:'#DEDEBA',
+				box_border_size:2,
+				box_border_color:'#eee',
+				time:60
+			};
+			$.extend(this.setting,setting || {});
+			this.init(id,this.setting);
+			//倒计时的流程
+			this.timer = '';
+			this.start_time();
+		};
+		Page.prototype={
+			start_time:function(){
+				var self = this;
+				self.timer = setInterval(function(){
+					if(self.last_time == 0){
+						alert('游戏结束!')
+						clearInterval(timer);
+					}else{
+						self.last_time-=1;	
+						$('.time').html(self.last_time);
+					}
+				},1000);
+			},
+			chicks:function(){
+				var self = this;
+				//事件委托：
+				this.boxs.delegate(".box_data","click",function(e){
+					//阻止事件冒泡
+					e.stopPropagation();
+					if(self.last_time == 0){
+						return;
+					}
+					//获取点击对象的className
+					var classname =this.className;
+					if (classname.indexOf('choose') != -1){
+						self.fen+=1;
+						//更新分数
+						$('div .fen span').html(self.fen);
+						self.level +=1;
+						if(self.level <4){
+							self.boxs_row+=1;
+						}else if(4 <= self.level <8){
+							self.boxs_row=7;
+						}else if (8 <= self.level < 20){
+							self.boxs_row=8;
+						}else{
+							self.boxs_row+=1;
+							self.boxs_row=self.boxs_row > 10 ? 10 : self.boxs_row;
+						}
+						self.init_boxs();
+					}
+				});
+				//点击暂停
+				this.stop.on('click',function(){
+					clearInterval(self.timer);
+					$('#three').hide();
+					$('#two').show();
+				})
+				//点击继续
+				$('#continue').on('click',function(){
+					clearInterval(self.timer);
+					$('#two').hide();
+					$('#three').show();
+					self.start_time();
+				})
+				//点击重来
+				$('#again').on('click',function(){
+					$('#two').hide();
+					$('#three').show();
+					clearInterval(self.timer);
+					self.init(self.id,self.setting);
+					self.start_time();
+				})
+			},
+			make_color:function(){
+				// alert(this.level)
+				var r= Math.floor(Math.random()*255);
+				var g= Math.floor(Math.random()*255);
+				var b= Math.floor(Math.random()*255);
+				var other = "rgb("+r+","+g+","+b+")";
+				g = g>50? g-40:g+40;
+				var choose = "rgb("+r+","+g+","+b+")";
+				return {other:other,choose:choose};
+			},
+			init_boxs:function(){
+				var row = this.boxs_row;
+				var choose = Math.floor(Math.random()*this.boxs_row*this.boxs_row);
+				var html = '';
+				for(i=0;i<row*row;i++){	
+					html += '<div class="box_data"></div>';
+				}
+				this.boxs.html(html);
+				this.boxChild = this.boxs.find('.box_data');
+				var boxsW = this.boxs.width();
+				var boxChildW = boxsW/row - this.setting.box_border_size*2;
+				//调用创造颜色的方法
+				var color = this.make_color();
+				this.boxChild.css({
+					width:boxChildW + 'px',
+					height:boxChildW +'px',
+					border:this.setting.box_border_size+'px solid '+this.setting.box_border_color,
+					backgroundColor:color.other
+				});
+				// var choose_child = $(boxChild)[choose];
+				// choose_child.style.backgroundColor=color.choose;
+				// 当前颜色不一样的盒子
+				this.choose_child = this.boxChild.eq(choose);
+				this.choose_child.addClass('choose');
+				this.choose_child.css({backgroundColor:color.choose})
+			},
+			init:function(id,setting){
+				//初始化页面
+				var page = $(id);
+				var html = 
+				'<div class="warp">'+
+					'<header>'+
+						'<div class="fen">得分：<span>0</span></div>'+
+						'<span class="time">60</span>'+
+						'<button class="stop">暂停</button>'+
+					'</header>'+
+					'<div class="box"> </div>'+
+				'</div>';
+				page.html(html);
+				//动态更新warp的宽高，如果页面的宽大于500，那么只取500，
+				//如果页面宽小于300，那么取300
+				var bodyW = $('body').width();
+				var width = bodyW > setting.maxW ? setting.maxW : (bodyW < setting.minW ? setting.minW:bodyW);
+				var warp = page.find('.warp');
+				warp.css({
+					width:width+'px'
+				});
+				//初始化暂停按钮的宽高
+				var stop = warp.find('.stop');
+				stop.css({
+					width:width*0.2
+				});
+				//暂停按钮的保存
+				this.stop = stop;
+				//初始化box的宽高
+				var boxs = warp.find('.box');
+				boxs.css({
+					width:width-2*setting.boxs_border_size + 'px',
+					height:width-2*setting.boxs_border_size + 'px',
+					border:setting.boxs_border_size+'px solid '+setting.boxs_border_color
+				});
+				this.boxs = boxs;
+				this.boxs_row = this.setting.boxs_row;
+				this.level = 0;
+				//当前分数是0
+				this.fen=0;
+				//倒计时的时间
+				this.last_time = this.setting.time;
+				//初始化盒子
+				this.init_boxs();
+				//初始化点击事件
+				this.chicks();
+			}
+		}
+		window['Page'] = Page;
+	})(jQuery)
+	$('.beginning').on('click',function(){
+		$('#one').hide();
+		$('#three').show();
+		var page = new Page('#three');
+	})
+</script>
+</html>
